@@ -57,3 +57,33 @@ func PostAdClickHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Ad click logged successfully"})
 }
+
+// GetAdClicksHandler serves a list of ad clicks
+func GetAdClicksHandler(w http.ResponseWriter, r *http.Request) {
+	db := InitDB()
+	defer db.Close()
+
+	// Query all ad clicks
+	rows, err := db.Query("SELECT ad_id, ip_address, video_time FROM ad_clicks")
+	if err != nil {
+		http.Error(w, "Failed to fetch ad clicks", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var adClicks []AdClick
+	for rows.Next() {
+		var adClick AdClick
+		if err := rows.Scan(&adClick.AdID, &adClick.IPAddress, &adClick.VideoTime); err != nil {
+			http.Error(w, "Failed to parse ad click data", http.StatusInternalServerError)
+			return
+		}
+		adClicks = append(adClicks, adClick)
+	}
+
+	// Return the ad clicks in JSON format
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(adClicks); err != nil {
+		http.Error(w, "Failed to encode ad clicks", http.StatusInternalServerError)
+	}
+}
