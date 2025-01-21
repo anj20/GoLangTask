@@ -1,4 +1,4 @@
-### README: Video Player Application with Interactive Ad Overlays
+### Video Player Application with Interactive Ad Overlays
 
 ---
 
