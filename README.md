@@ -114,34 +114,6 @@ This project aims to build a video player application with interactive ad overla
 
 ---
 
-## **Project Structure**
-
-### **Frontend**
-```
-/frontend
-├── src
-│   ├── components
-│   ├── services
-│   ├── App.js
-│   ├── index.js
-├── public
-│   ├── index.html
-├── package.json
-```
-
-### **Backend**
-```
-/backend
-├── main.go
-├── handlers
-├── models
-├── database
-│   ├── init_db.go
-├── Dockerfile
-```
-
----
-
 ## **API Endpoints**
 
 ### **GET /ads**
@@ -199,21 +171,6 @@ Logs ad click metadata.
 
 ---
 
-## **Evaluation Criteria**
-
-1. **Functionality**:
-   - Ads display dynamically.
-   - Ad clicks log metadata correctly.
-2. **Code Quality**:
-   - Modular and maintainable.
-   - Proper comments and best practices.
-3. **Production Readiness**:
-   - Dockerized setup with clear README.
-4. **Bonus Features**:
-   - Advanced UI/UX enhancements.
-   - Analytics dashboard (optional).
-
----
 
 ## **Future Enhancements**
 1. Add unit tests for the backend APIs.
