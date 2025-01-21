@@ -38,7 +38,15 @@ const VideoPlayer = () => {
 
   const handleAdClick = async (ad) => {
     try {
-      await axios.post(`${API_BASE_URL}/ads/click`, { ad_id: ad.id });
+      // Fetch the user's IP address
+      const ipResponse = await axios.get("https://api.ipify.org?format=json");
+      const { ip } = ipResponse.data;
+      console.log(ip);
+      // Send the ad click data to the backend
+      await axios.post(`${API_BASE_URL}/ads/click`, {
+        ad_id: ad.id,
+        ip_address: ip, // Include the IP address in the payload
+      });
       window.open(ad.target_url, "_blank");
     } catch (error) {
       console.error("Error logging ad click:", error);

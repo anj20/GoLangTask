@@ -17,7 +17,8 @@ func InitDB() *sql.DB {
 		CREATE TABLE IF NOT EXISTS ads (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			image_url TEXT NOT NULL,
-			target_url TEXT NOT NULL
+			target_url TEXT NOT NULL,
+			video_time TEXT
 		);
 	`
 	createClickTable := `

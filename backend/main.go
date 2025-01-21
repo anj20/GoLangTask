@@ -8,17 +8,23 @@ import (
 )
 
 func main() {
-	// SeedAds()
 	// Initialize database
 	db := InitDB()
 	defer db.Close()
 
 	// DeleteAllAds()
+
+
+	// Delete All Add Clicks
+	// DeleteAllAdsClicks();
+
+
 	// Set up router
 	r := mux.NewRouter()
 
 	// Register routes
 	r.HandleFunc("/ads", GetAdsHandler).Methods("GET")
+	r.HandleFunc("/ads", PostAds).Methods("POST")
 	r.HandleFunc("/ads/click", PostAdClickHandler).Methods("POST")
 	r.HandleFunc("/ads/click", GetAdClicksHandler).Methods("GET")
 	r.Use(IPMiddleware)

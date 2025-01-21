@@ -4,6 +4,7 @@ type Ad struct {
 	ID       int    `json:"id"`
 	ImageURL string `json:"image_url"`
 	TargetURL string `json:"target_url"`
+	VideoTime string `json:"video_time"`
 }
 
 type AdClick struct {
