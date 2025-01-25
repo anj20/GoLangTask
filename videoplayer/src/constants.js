@@ -16,7 +16,7 @@ export const AD_ICON_STYLE = {
 
 export const AD_POSITIONS = [
   { top: "10%", left: "10%" },
-  { top: "10%", left: "80%" },
-  { top: "80%", left: "10%" },
-  { top: "80%", left: "80%" },
+  { top: "20%", left: "60%" },
+  { top: "60%", left: "20%" },
+  { top: "60%", left: "60%" },
 ];

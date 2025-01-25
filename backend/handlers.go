@@ -3,16 +3,26 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
 )
 
-// GetAdsHandler serves a list of ads
+// GetAdsHandler serves a list of ads along with their video time
 func GetAdsHandler(w http.ResponseWriter, r *http.Request) {
 	db := InitDB()
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, image_url, target_url FROM ads")
+	// Fetch ads from the ads table and get video_time from the ads table
+	query := `
+		SELECT 
+			id, 
+			image_url, 
+			target_url, 
+			video_time 
+		FROM ads
+	`
+
+	rows, err := db.Query(query)
 	if err != nil {
 		http.Error(w, "Failed to fetch ads", http.StatusInternalServerError)
 		return
@@ -22,7 +32,7 @@ func GetAdsHandler(w http.ResponseWriter, r *http.Request) {
 	var ads []Ad
 	for rows.Next() {
 		var ad Ad
-		if err := rows.Scan(&ad.ID, &ad.ImageURL, &ad.TargetURL); err != nil {
+		if err := rows.Scan(&ad.ID, &ad.ImageURL, &ad.TargetURL, &ad.VideoTime); err != nil {
 			http.Error(w, "Failed to parse ad data", http.StatusInternalServerError)
 			return
 		}
@@ -70,7 +80,7 @@ func PostAdClickHandler(w http.ResponseWriter, r *http.Request) {
 
 	var adClick AdClick
 	if err := json.NewDecoder(r.Body).Decode(&adClick); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid request body 213", http.StatusBadRequest)
 		return
 	}
 
@@ -89,14 +99,10 @@ func PostAdClickHandler(w http.ResponseWriter, r *http.Request) {
 	// Add the video time to the AdClick struct
 	adClick.VideoTime = videoTime
 
-	// Get IP address from the request context
-	ip := r.Context().Value("ip").(string)
-	adClick.IPAddress = ip
-
 	// Log the ad click metadata into the ad_clicks table
 	_, err = db.Exec(
-		"INSERT INTO ad_clicks (ad_id, ip_address, video_time) VALUES (?, ?, ?)",
-		adClick.AdID, adClick.IPAddress, adClick.VideoTime,
+		"INSERT INTO ad_clicks (ad_id, ip_address, video_time, timestamp) VALUES (?, ?, ?, ?)",
+		adClick.AdID, adClick.IPAddress, adClick.VideoTime, adClick.TimeStamp,
 	)
 	if err != nil {
 		http.Error(w, "Failed to log ad click", http.StatusInternalServerError)
@@ -113,7 +119,7 @@ func GetAdClicksHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	// Query all ad clicks
-	rows, err := db.Query("SELECT ad_id, ip_address, video_time FROM ad_clicks")
+	rows, err := db.Query("SELECT ad_id, ip_address, video_time, timestamp FROM ad_clicks")
 	if err != nil {
 		http.Error(w, "Failed to fetch ad clicks", http.StatusInternalServerError)
 		return
@@ -123,7 +129,8 @@ func GetAdClicksHandler(w http.ResponseWriter, r *http.Request) {
 	var adClicks []AdClick
 	for rows.Next() {
 		var adClick AdClick
-		if err := rows.Scan(&adClick.AdID, &adClick.IPAddress, &adClick.VideoTime); err != nil {
+		if err := rows.Scan(&adClick.AdID, &adClick.IPAddress, &adClick.VideoTime, &adClick.TimeStamp); err != nil {
+			log.Printf("Error scanning row: %v", err) // Log the error
 			http.Error(w, "Failed to parse ad click data", http.StatusInternalServerError)
 			return
 		}
@@ -137,4 +144,52 @@ func GetAdClicksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteAllAdsClicks deletes all ads from the ads table
+func DeleteAllAdsClicksHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow DELETE method
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Invalid request method. Use DELETE.", http.StatusMethodNotAllowed)
+		return
+	}
 
+	// Initialize the database
+	db := InitDB()
+	defer db.Close()
+
+	// Execute the DELETE query
+	_, err := db.Exec("DELETE FROM ad_clicks")
+	if err != nil {
+		log.Printf("Failed to delete ad clicks: %v\n", err)
+		http.Error(w, "Failed to delete ad clicks", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("All ad clicks have been deleted successfully")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("All ad clicks have been deleted successfully"))
+}
+
+// DeleteAllAds deletes all ads from the ads table
+func DeleteAllAdsHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow DELETE method
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Invalid request method. Use DELETE.", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Initialize the database
+	db := InitDB()
+	defer db.Close()
+
+	// Execute the DELETE query
+	_, err := db.Exec("DELETE FROM ads")
+	if err != nil {
+		log.Printf("Failed to delete ads: %v\n", err)
+		http.Error(w, "Failed to delete ads", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("All ads have been deleted successfully")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("All ads have been deleted successfully"))
+}

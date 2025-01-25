@@ -12,12 +12,7 @@ func main() {
 	db := InitDB()
 	defer db.Close()
 
-	// DeleteAllAds()
-
-
-	// Delete All Add Clicks
-	// DeleteAllAdsClicks();
-
+	// SeedAds();
 
 	// Set up router
 	r := mux.NewRouter()
@@ -25,9 +20,10 @@ func main() {
 	// Register routes
 	r.HandleFunc("/ads", GetAdsHandler).Methods("GET")
 	r.HandleFunc("/ads", PostAds).Methods("POST")
+	r.HandleFunc("/ads", DeleteAllAdsHandler).Methods("DELETE")
 	r.HandleFunc("/ads/click", PostAdClickHandler).Methods("POST")
 	r.HandleFunc("/ads/click", GetAdClicksHandler).Methods("GET")
-	r.Use(IPMiddleware)
+	r.HandleFunc("/ads/click", DeleteAllAdsClicksHandler).Methods("DELETE")
 
 	// Enable CORS
     c := cors.New(cors.Options{

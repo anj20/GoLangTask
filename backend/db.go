@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -18,14 +19,14 @@ func InitDB() *sql.DB {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			image_url TEXT NOT NULL,
 			target_url TEXT NOT NULL,
-			video_time TEXT
+			video_time TEXT NOT NULL
 		);
 	`
 	createClickTable := `
 		CREATE TABLE IF NOT EXISTS ad_clicks (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			ad_id INTEGER,
-			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+			timestamp TEXT,
 			ip_address TEXT,
 			video_time TEXT
 		);
